@@ -8,7 +8,19 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: [
+          "var(--font-pretendard)",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "system-ui",
+          "Segoe UI",
+          "Apple SD Gothic Neo",
+          "sans-serif",
+        ],
+      },
+    },
   },
   plugins: [],
 };

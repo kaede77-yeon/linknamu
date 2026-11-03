@@ -28,17 +28,19 @@ export default function LinkCard({ link, initialCount = 0 }: Props) {
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
-      className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
+      className="flex items-center justify-between gap-4 rounded-3xl border border-white/60 bg-white/55 px-6 py-5 shadow-[0_8px_24px_-12px_rgba(120,84,60,0.28)] backdrop-blur-md transition duration-300 hover:border-white/80 hover:bg-white/75 hover:shadow-[0_12px_28px_-12px_rgba(120,84,60,0.34)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300/70 dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_8px_24px_-14px_rgba(0,0,0,0.6)] dark:hover:border-white/20 dark:hover:bg-white/[0.1]"
     >
       <span className="min-w-0">
-        <span className="block truncate font-medium">{link.title}</span>
+        <span className="block truncate font-semibold tracking-[-0.01em]">
+          {link.title}
+        </span>
         {link.description && (
-          <span className="block truncate text-sm text-slate-500 dark:text-slate-400">
+          <span className="mt-0.5 block truncate text-sm text-stone-500 dark:text-stone-400">
             {link.description}
           </span>
         )}
       </span>
-      <span className="shrink-0 text-xs text-slate-400 dark:text-slate-500">
+      <span className="shrink-0 text-[11px] font-medium tabular-nums text-stone-400 dark:text-stone-500">
         {count.toLocaleString()} 클릭
       </span>
     </a>

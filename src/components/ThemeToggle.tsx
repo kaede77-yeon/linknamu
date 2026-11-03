@@ -27,7 +27,7 @@ export default function ThemeToggle() {
       type="button"
       aria-label={theme === "dark" ? "밝은 화면으로 전환" : "어두운 화면으로 전환"}
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="rounded-full border border-slate-200 bg-white/70 p-2 text-lg leading-none shadow-sm transition hover:bg-white dark:border-slate-700 dark:bg-slate-800/70 dark:hover:bg-slate-800"
+      className="rounded-full border border-white/60 bg-white/50 p-2 text-base leading-none shadow-[0_6px_18px_-10px_rgba(120,84,60,0.35)] backdrop-blur-md transition duration-300 hover:bg-white/75 dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.12]"
     >
       {theme === "dark" ? "☀️" : "🌙"}
     </button>

@@ -6,28 +6,28 @@ export type LinkItem = {
 };
 
 export const profile = {
-  name: "이연규",
-  bio: "에이아이 배우기",
-  avatar: "/avatar.svg",
+  name: "이 연규",
+  bio: "공공기관 AX | AI활용에 관심 많음",
+  avatar: "/profile.jpeg",
 };
 
 export const links: LinkItem[] = [
   {
     id: "blog",
-    title: "블로그",
+    title: "📝 블로그",
     description: "배운 것들을 기록합니다",
-    url: "https://example.com/blog",
+    url: "https://blog.naver.com/kaede77",
   },
   {
     id: "github",
-    title: "GitHub",
+    title: "💻 GitHub",
     description: "만든 것들",
-    url: "https://github.com",
+    url: "https://github.com/kaede77-yeon",
   },
   {
-    id: "instagram",
-    title: "Instagram",
-    description: "일상",
-    url: "https://instagram.com",
+    id: "email",
+    title: "✉️ 이메일",
+    description: "kaede77@naver.com",
+    url: "mailto:kaede77@naver.com",
   },
 ];

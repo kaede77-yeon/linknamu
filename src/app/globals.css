@@ -1,3 +1,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* 따뜻한 크림 → 연한 살구 그라데이션 */
+    --bg-from: #fdf8f1;
+    --bg-via: #fbeee0;
+    --bg-to: #f7dcc8;
+  }
+
+  .dark {
+    --bg-from: #1c1917;
+    --bg-via: #231d1a;
+    --bg-to: #2c211c;
+  }
+
+  body {
+    background: radial-gradient(
+        120% 80% at 50% 0%,
+        rgb(255 255 255 / 0.55) 0%,
+        transparent 60%
+      ),
+      linear-gradient(160deg, var(--bg-from) 0%, var(--bg-via) 48%, var(--bg-to) 100%);
+    background-attachment: fixed;
+  }
+
+  .dark body {
+    background: radial-gradient(
+        120% 80% at 50% 0%,
+        rgb(255 255 255 / 0.06) 0%,
+        transparent 60%
+      ),
+      linear-gradient(160deg, var(--bg-from) 0%, var(--bg-via) 48%, var(--bg-to) 100%);
+    background-attachment: fixed;
+  }
+}

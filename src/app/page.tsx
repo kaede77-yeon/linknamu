@@ -15,18 +15,17 @@ export default async function Home() {
   }
 
   return (
-    <main className="flex min-h-screen w-full items-center justify-center px-4 py-8">
-      {/* 와이어프레임의 둥근 프레임 */}
-      <section className="relative w-full max-w-sm rounded-[2rem] border border-slate-300 bg-white px-6 pb-10 pt-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+    <main className="flex min-h-screen w-full justify-center px-6 py-14 sm:py-20">
+      <section className="relative w-full max-w-md">
         <div className="flex justify-end">
           <ThemeToggle />
         </div>
 
-        <div className="mt-2">
+        <div className="mt-6">
           <Profile />
         </div>
 
-        <nav className="mt-8 flex flex-col gap-4">
+        <nav className="mt-12 flex flex-col gap-4 sm:gap-5">
           {links.map((link) => (
             <LinkCard key={link.id} link={link} initialCount={counts[link.id]} />
           ))}
