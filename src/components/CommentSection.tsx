@@ -79,7 +79,7 @@ export default function CommentSection() {
         </p>
       )}
 
-      <ul className="mt-4 flex flex-col gap-4">
+      <ul className="mt-5 flex flex-col gap-8">
         {tree.map((node) => (
           <CommentThread
             key={node.id}
