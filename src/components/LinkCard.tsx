@@ -5,17 +5,20 @@ import type { LinkItem } from "@/data/profile";
 
 type Props = {
   link: LinkItem;
-  initialCount?: number;
+  /** 서버에서 받아온 클릭 수. 아직 받지 못했으면 undefined */
+  count?: number;
 };
 
-export default function LinkCard({ link, initialCount = 0 }: Props) {
-  const [count, setCount] = useState(initialCount);
+export default function LinkCard({ link, count }: Props) {
+  // 내가 방금 누른 횟수. 서버 값이 늦게 도착해도 덮어쓰이지 않도록 따로 센다
+  const [myClicks, setMyClicks] = useState(0);
+  const displayCount = (count ?? 0) + myClicks;
 
   // 링크 이동을 막지 않도록 집계는 백그라운드로 보낸다
   function handleClick() {
-    setCount((prev) => prev + 1);
+    setMyClicks((prev) => prev + 1);
     const url = `/api/links/${link.id}/click`;
-    if (navigator.sendBeacon) {
+    if (typeof navigator !== "undefined" && navigator.sendBeacon) {
       navigator.sendBeacon(url);
     } else {
       fetch(url, { method: "POST", keepalive: true }).catch(() => {});
@@ -41,7 +44,7 @@ export default function LinkCard({ link, initialCount = 0 }: Props) {
         )}
       </span>
       <span className="shrink-0 text-[11px] font-medium tabular-nums text-stone-400 dark:text-stone-500">
-        {count.toLocaleString()} 클릭
+        {displayCount.toLocaleString()}회
       </span>
     </a>
   );
