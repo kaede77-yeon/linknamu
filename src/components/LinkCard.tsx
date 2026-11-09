@@ -16,6 +16,7 @@ export default function LinkCard({ link, count }: Props) {
 
   // 링크 이동을 막지 않도록 집계는 백그라운드로 보낸다
   function handleClick() {
+    if (link.internal) return; // 내부 메뉴는 클릭 수를 세지 않는다
     setMyClicks((prev) => prev + 1);
     const url = `/api/links/${link.id}/click`;
     if (typeof navigator !== "undefined" && navigator.sendBeacon) {
@@ -43,9 +44,18 @@ export default function LinkCard({ link, count }: Props) {
           </span>
         )}
       </span>
-      <span className="shrink-0 text-[11px] font-medium tabular-nums text-stone-400 dark:text-stone-500">
-        {displayCount.toLocaleString()}회
-      </span>
+      {link.internal ? (
+        <span
+          aria-hidden="true"
+          className="shrink-0 text-sm text-stone-400 dark:text-stone-500"
+        >
+          →
+        </span>
+      ) : (
+        <span className="shrink-0 text-[11px] font-medium tabular-nums text-stone-400 dark:text-stone-500">
+          {displayCount.toLocaleString()}회
+        </span>
+      )}
     </a>
   );
 }

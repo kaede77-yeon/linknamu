@@ -9,7 +9,9 @@ export async function GET() {
   try {
     const stored = await getClickCounts();
     const counts = Object.fromEntries(
-      links.map((link) => [link.id, stored[link.id] ?? 0])
+      links
+        .filter((link) => !link.internal)
+        .map((link) => [link.id, stored[link.id] ?? 0])
     );
     return NextResponse.json(
       { counts },
