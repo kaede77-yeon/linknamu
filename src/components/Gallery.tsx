@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Lightbox from "@/components/Lightbox";
+import Pagination from "@/components/Pagination";
 import PasswordPrompt from "@/components/PasswordPrompt";
 import {
   MAX_FILES_PER_UPLOAD,
@@ -9,6 +10,9 @@ import {
   imageUrl,
   type GalleryImage,
 } from "@/types/gallery";
+
+/** 한 페이지에 보여줄 사진 수 */
+const PAGE_SIZE = 10;
 
 const PILL =
   "rounded-full border border-white/60 bg-white/60 px-3.5 py-2 text-xs font-medium shadow-[0_6px_18px_-10px_rgba(120,84,60,0.35)] backdrop-blur-md transition duration-300 hover:bg-white/85 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.12]";
@@ -22,7 +26,9 @@ export default function Gallery() {
   const [selecting, setSelecting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [askPassword, setAskPassword] = useState(false);
+  const [page, setPage] = useState(1);
   const fileInput = useRef<HTMLInputElement>(null);
+  const gridTop = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -61,6 +67,8 @@ export default function Gallery() {
       const added = (data.images ?? []) as GalleryImage[];
       setImages((prev) => [...added, ...(prev ?? [])]);
       setMessage(`${added.length}장을 올렸어요`);
+      // 새 사진은 맨 앞에 붙으므로 첫 페이지로 옮겨 보여준다
+      setPage(1);
       // 일부만 막힌 경우도 알려준다
       if (data.errors) setError((data.errors as string[]).join("\n"));
     } catch (err) {
@@ -120,6 +128,21 @@ export default function Gallery() {
   }
 
   const list = images ?? [];
+  const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+  const current = Math.min(page, totalPages);
+  const start = (current - 1) * PAGE_SIZE;
+  const visible = list.slice(start, start + PAGE_SIZE);
+
+  // 사진이 지워져 마지막 페이지가 사라지면 상태도 따라 줄인다
+  useEffect(() => {
+    setPage((prev) => Math.min(prev, totalPages));
+  }, [totalPages]);
+
+  function goTo(next: number) {
+    setPage(next);
+    setViewing(null);
+    gridTop.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
     <div className="mt-8">
@@ -158,7 +181,11 @@ export default function Gallery() {
               선택
             </button>
             <span className="ml-auto text-[11px] tabular-nums text-stone-400 dark:text-stone-500">
-              {images ? `${list.length}장` : "불러오는 중…"}
+              {!images
+                ? "불러오는 중…"
+                : totalPages > 1
+                  ? `${list.length}장 · ${current}/${totalPages} 쪽`
+                  : `${list.length}장`}
             </span>
           </>
         ) : (
@@ -219,8 +246,10 @@ export default function Gallery() {
         </p>
       )}
 
+      <div ref={gridTop} className="scroll-mt-6" />
+
       <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {list.map((item, index) => {
+        {visible.map((item, index) => {
           const isSelected = selected.has(item.id);
           return (
             <li key={item.id}>
@@ -258,10 +287,17 @@ export default function Gallery() {
         })}
       </ul>
 
-      {viewing !== null && list.length > 0 && (
+      <Pagination
+        page={current}
+        totalPages={totalPages}
+        onChange={goTo}
+        label="갤러리 페이지"
+      />
+
+      {viewing !== null && visible.length > 0 && (
         <Lightbox
-          images={list}
-          index={Math.min(viewing, list.length - 1)}
+          images={visible}
+          index={Math.min(viewing, visible.length - 1)}
           onMove={setViewing}
           onClose={() => setViewing(null)}
         />
