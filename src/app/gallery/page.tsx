@@ -28,7 +28,7 @@ export default function GalleryPage() {
             🖼 나만의 갤러리
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
-            사진을 올리고 바둑판으로 모아 봅니다. 사진을 누르면 크게 볼 수 있어요.
+            사진을 누르면 크게 볼 수 있어요.
           </p>
         </header>
 

@@ -11,8 +11,12 @@ import {
   type GalleryImage,
 } from "@/types/gallery";
 
-/** 한 페이지에 보여줄 사진 수 */
-const PAGE_SIZE = 10;
+/** 한 페이지에 보여줄 사진 수 (3열 바둑판에 딱 맞게 9장) */
+const PAGE_SIZE = 9;
+
+/** 가장 중요한 동작이라 호박색으로 띄우고 글자도 한 단계 크게 */
+const UPLOAD_PILL =
+  "rounded-full border border-amber-400/70 bg-amber-300/90 px-4 py-2 text-[0.9rem] font-semibold text-stone-900 shadow-[0_8px_20px_-8px_rgba(217,152,43,0.65)] backdrop-blur-md transition duration-300 hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-45 dark:border-amber-300/40 dark:bg-amber-400/90 dark:text-stone-900 dark:hover:bg-amber-400";
 
 const PILL =
   "rounded-full border border-white/60 bg-white/60 px-3.5 py-2 text-xs font-medium shadow-[0_6px_18px_-10px_rgba(120,84,60,0.35)] backdrop-blur-md transition duration-300 hover:bg-white/85 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.12]";
@@ -168,7 +172,7 @@ export default function Gallery() {
               type="button"
               disabled={uploading}
               onClick={() => fileInput.current?.click()}
-              className={PILL}
+              className={UPLOAD_PILL}
             >
               {uploading ? "올리는 중…" : "＋ 사진 올리기"}
             </button>
@@ -178,7 +182,7 @@ export default function Gallery() {
               onClick={() => setSelecting(true)}
               className={PILL}
             >
-              선택
+              사진선택
             </button>
             <span className="ml-auto text-[11px] tabular-nums text-stone-400 dark:text-stone-500">
               {!images
