@@ -29,6 +29,7 @@ export default function CommentsPage() {
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
             자유롭게 한마디 남겨주세요. 답글은 2번까지 달 수 있어요.
+            비밀번호 숫자 4자리를 적어두면 나중에 수정·삭제할 수 있어요.
           </p>
         </header>
 

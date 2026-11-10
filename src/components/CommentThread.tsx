@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import CommentForm from "@/components/CommentForm";
+import PasswordPrompt from "@/components/PasswordPrompt";
 import { MAX_DEPTH, type CommentNode } from "@/types/comment";
 
 type Props = {
@@ -9,8 +11,10 @@ type Props = {
   onReplyOpen: (id: string | null) => void;
   onReply: (
     parentId: string,
-    input: { author: string; body: string }
+    input: { author: string; body: string; password: string }
   ) => Promise<void>;
+  onEdit: (id: string, input: { body: string; password: string }) => Promise<void>;
+  onDelete: (id: string, password: string) => Promise<void>;
   /** 형제 중 마지막이면 연결선을 꺾임에서 끊는다 */
   isLast?: boolean;
 };
@@ -25,17 +29,24 @@ function formatDate(iso: string) {
 
 const LINE = "border-stone-300/70 dark:border-white/15";
 const LINE_BG = "bg-stone-300/70 dark:bg-white/15";
+const ACTION_CLASS =
+  "text-xs font-medium text-stone-500 transition hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100";
 
 export default function CommentThread({
   node,
   replyTo,
   onReplyOpen,
   onReply,
+  onEdit,
+  onDelete,
   isLast = true,
 }: Props) {
+  const [action, setAction] = useState<"none" | "edit" | "delete">("none");
+
   const canReply = node.depth < MAX_DEPTH;
   const isReplying = replyTo === node.id;
   const isReply = node.depth > 0;
+  const idle = action === "none" && !isReplying;
 
   return (
     <li className={isReply ? "relative pt-6 pl-6 sm:pl-9" : undefined}>
@@ -73,25 +84,81 @@ export default function CommentThread({
             </span>
           </span>
           <time
-            dateTime={node.createdAt}
+            dateTime={node.updatedAt ?? node.createdAt}
             className="shrink-0 text-[11px] tabular-nums text-stone-400 dark:text-stone-500"
           >
             {formatDate(node.createdAt)}
+            {node.updatedAt ? " (수정)" : ""}
           </time>
         </div>
 
-        <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-          {node.body}
-        </p>
+        {action === "edit" ? (
+          <div className="mt-3">
+            <CommentForm
+              compact
+              autoFocus
+              mode="edit"
+              initialBody={node.body}
+              submitLabel="수정하기"
+              placeholder="내용을 고쳐주세요"
+              onCancel={() => setAction("none")}
+              onSubmit={async (input) => {
+                await onEdit(node.id, {
+                  body: input.body,
+                  password: input.password,
+                });
+                setAction("none");
+              }}
+            />
+          </div>
+        ) : (
+          <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+            {node.body}
+          </p>
+        )}
 
-        {canReply && !isReplying && (
-          <button
-            type="button"
-            onClick={() => onReplyOpen(node.id)}
-            className="mt-3 text-xs font-medium text-stone-500 transition hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100"
-          >
-            답글 쓰기
-          </button>
+        {idle && (
+          <div className="mt-3 flex items-center gap-3">
+            {canReply && (
+              <button
+                type="button"
+                onClick={() => onReplyOpen(node.id)}
+                className={ACTION_CLASS}
+              >
+                답글 쓰기
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setAction("edit")}
+              className={ACTION_CLASS}
+            >
+              수정
+            </button>
+            <button
+              type="button"
+              onClick={() => setAction("delete")}
+              className="text-xs font-medium text-stone-500 transition hover:text-rose-600 dark:text-stone-400 dark:hover:text-rose-400"
+            >
+              삭제
+            </button>
+          </div>
+        )}
+
+        {action === "delete" && (
+          <div className="mt-3 border-t border-white/60 pt-3 dark:border-white/10">
+            <PasswordPrompt
+              danger
+              confirmLabel="삭제하기"
+              label={
+                node.replies.length > 0
+                  ? "이 댓글에 달린 답글까지 함께 지워집니다. 비밀번호를 입력해 주세요."
+                  : "댓글을 지우려면 비밀번호를 입력해 주세요."
+              }
+              onCancel={() => setAction("none")}
+              onConfirm={(password) => onDelete(node.id, password)}
+            />
+          </div>
         )}
 
         {isReplying && (
@@ -117,6 +184,8 @@ export default function CommentThread({
               replyTo={replyTo}
               onReplyOpen={onReplyOpen}
               onReply={onReply}
+              onEdit={onEdit}
+              onDelete={onDelete}
               isLast={index === node.replies.length - 1}
             />
           ))}

@@ -1,17 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { AUTHOR_MAX, BODY_MAX } from "@/types/comment";
+import { AUTHOR_MAX, BODY_MAX, PASSWORD_LENGTH } from "@/types/comment";
+
+export type CommentFormInput = {
+  author: string;
+  body: string;
+  password: string;
+};
 
 type Props = {
-  onSubmit: (input: { author: string; body: string }) => Promise<void>;
-  /** 답글 폼은 조금 더 작고 취소 버튼이 붙는다 */
+  onSubmit: (input: CommentFormInput) => Promise<void>;
+  /** 답글·수정 폼은 조금 더 작고 취소 버튼이 붙는다 */
   compact?: boolean;
   placeholder?: string;
   submitLabel?: string;
   onCancel?: () => void;
   autoFocus?: boolean;
+  /** 수정 폼은 이름을 받지 않고 기존 내용으로 시작한다 */
+  mode?: "create" | "edit";
+  initialBody?: string;
 };
+
+export const FIELD_CLASS =
+  "w-full rounded-2xl border border-white/60 bg-white/60 px-4 py-2.5 text-sm placeholder:text-stone-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-amber-300/70 dark:border-white/10 dark:bg-white/[0.06] dark:placeholder:text-stone-500";
+
+export function onlyDigits(value: string) {
+  return value.replace(/\D/g, "").slice(0, PASSWORD_LENGTH);
+}
 
 export default function CommentForm({
   onSubmit,
@@ -20,14 +36,18 @@ export default function CommentForm({
   submitLabel = "남기기",
   onCancel,
   autoFocus = false,
+  mode = "create",
+  initialBody = "",
 }: Props) {
   const [author, setAuthor] = useState("");
-  const [body, setBody] = useState("");
+  const [body, setBody] = useState(initialBody);
+  const [password, setPassword] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const trimmed = body.trim();
-  const disabled = sending || trimmed.length === 0;
+  const passwordReady = password.length === PASSWORD_LENGTH;
+  const disabled = sending || trimmed.length === 0 || !passwordReady;
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -36,9 +56,12 @@ export default function CommentForm({
     setSending(true);
     setError(null);
     try {
-      await onSubmit({ author: author.trim(), body: trimmed });
-      setAuthor("");
-      setBody("");
+      await onSubmit({ author: author.trim(), body: trimmed, password });
+      if (mode === "create") {
+        setAuthor("");
+        setBody("");
+      }
+      setPassword("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "댓글을 저장하지 못했습니다");
     } finally {
@@ -46,19 +69,18 @@ export default function CommentForm({
     }
   }
 
-  const fieldClass =
-    "w-full rounded-2xl border border-white/60 bg-white/60 px-4 py-2.5 text-sm placeholder:text-stone-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-amber-300/70 dark:border-white/10 dark:bg-white/[0.06] dark:placeholder:text-stone-500";
-
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2.5">
-      <input
-        type="text"
-        value={author}
-        maxLength={AUTHOR_MAX}
-        onChange={(event) => setAuthor(event.target.value)}
-        placeholder="이름 (비워두면 익명)"
-        className={fieldClass}
-      />
+      {mode === "create" && (
+        <input
+          type="text"
+          value={author}
+          maxLength={AUTHOR_MAX}
+          onChange={(event) => setAuthor(event.target.value)}
+          placeholder="이름 (비워두면 익명)"
+          className={FIELD_CLASS}
+        />
+      )}
       <textarea
         value={body}
         maxLength={BODY_MAX}
@@ -66,7 +88,21 @@ export default function CommentForm({
         onChange={(event) => setBody(event.target.value)}
         placeholder={placeholder}
         rows={compact ? 2 : 3}
-        className={`${fieldClass} resize-none leading-relaxed`}
+        className={`${FIELD_CLASS} resize-none leading-relaxed`}
+      />
+      <input
+        type="password"
+        inputMode="numeric"
+        autoComplete="off"
+        value={password}
+        maxLength={PASSWORD_LENGTH}
+        onChange={(event) => setPassword(onlyDigits(event.target.value))}
+        placeholder={
+          mode === "edit"
+            ? `비밀번호 숫자 ${PASSWORD_LENGTH}자리`
+            : `비밀번호 숫자 ${PASSWORD_LENGTH}자리 (수정·삭제할 때 필요해요)`
+        }
+        className={`${FIELD_CLASS} tracking-[0.4em]`}
       />
 
       {error && (

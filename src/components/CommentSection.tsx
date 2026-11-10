@@ -32,6 +32,7 @@ export default function CommentSection() {
   async function submit(input: {
     author: string;
     body: string;
+    password: string;
     parentId?: string | null;
   }) {
     const res = await fetch("/api/comments", {
@@ -47,6 +48,42 @@ export default function CommentSection() {
     const created = data.comment as CommentItem;
     setComments((prev) => [...(prev ?? []), created]);
     setReplyTo(null);
+    setLoadError(null);
+  }
+
+  async function edit(id: string, input: { body: string; password: string }) {
+    const res = await fetch(`/api/comments/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data?.error ?? "댓글을 수정하지 못했습니다");
+    }
+
+    const updated = data.comment as CommentItem;
+    setComments((prev) =>
+      (prev ?? []).map((item) => (item.id === updated.id ? updated : item))
+    );
+    setLoadError(null);
+  }
+
+  async function remove(id: string, password: string) {
+    const res = await fetch(`/api/comments/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data?.error ?? "댓글을 삭제하지 못했습니다");
+    }
+
+    // 답글까지 함께 지워졌을 수 있다
+    const gone = new Set<string>(data?.deletedIds ?? [id]);
+    setComments((prev) => (prev ?? []).filter((item) => !gone.has(item.id)));
+    setReplyTo((current) => (current && gone.has(current) ? null : current));
     setLoadError(null);
   }
 
@@ -87,6 +124,8 @@ export default function CommentSection() {
             replyTo={replyTo}
             onReplyOpen={setReplyTo}
             onReply={(parentId, input) => submit({ ...input, parentId })}
+            onEdit={edit}
+            onDelete={remove}
           />
         ))}
       </ul>

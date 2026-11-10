@@ -30,6 +30,7 @@ export async function POST(request: Request) {
       author: payload?.author,
       body: payload?.body,
       parentId: payload?.parentId,
+      password: payload?.password,
     });
     return NextResponse.json({ comment }, { status: 201 });
   } catch (error) {

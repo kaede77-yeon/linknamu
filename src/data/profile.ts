@@ -21,10 +21,11 @@ export const links: LinkItem[] = [
     url: "https://blog.naver.com/kaede77",
   },
   {
-    id: "github",
-    title: "💻 GitHub",
-    description: "만든 것들",
-    url: "https://github.com/kaede77-yeon",
+    id: "gallery",
+    title: "🖼 나만의 갤러리",
+    description: "사진을 올리고 모아봅니다",
+    url: "/gallery",
+    internal: true,
   },
   {
     id: "comment",

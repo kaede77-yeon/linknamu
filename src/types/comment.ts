@@ -7,6 +7,15 @@ export const AUTHOR_MAX = 20;
 export const BODY_MAX = 500;
 export const DEFAULT_AUTHOR = "익명";
 
+/** 수정·삭제 확인용 비밀번호는 숫자 4자리 */
+export const PASSWORD_LENGTH = 4;
+/** 비밀번호가 없던 기존 댓글은 이 값으로 취급한다 */
+export const LEGACY_PASSWORD = "0000";
+
+export function isValidPassword(value: unknown): value is string {
+  return typeof value === "string" && /^[0-9]{4}$/.test(value);
+}
+
 export type CommentItem = {
   id: string;
   parentId: string | null;
@@ -14,6 +23,7 @@ export type CommentItem = {
   author: string;
   body: string;
   createdAt: string; // ISO 문자열
+  updatedAt: string | null; // 수정된 적이 없으면 null
 };
 
 export type CommentNode = CommentItem & {
